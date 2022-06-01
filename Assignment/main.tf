@@ -1,3 +1,8 @@
+//adding terraform backend block to create terraform state file on azure
+Terraform {
+ backend "azure" {} 
+}
+
 resource "azurerm_resource_group" "rg" {
   name      = "myresourcegoup"
   location  = var.resource_group_location //"westeurope"
