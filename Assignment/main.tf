@@ -1,5 +1,5 @@
 //adding terraform backend block to create terraform state file on azure
-Terraform {
+terraform {
  backend "azure" {} 
 }
 
