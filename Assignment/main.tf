@@ -35,14 +35,14 @@ resource "azurerm_subnet" "myterraformsubnet2" {
 
 #we can ssh(one of the way to connect) to the vm using this pubic ip over internet
 
-# Create public IPs for vm1
+# Create public IPs NIC1 configuration
 resource "azurerm_public_ip" "myterraformpublicip1" {
   name                = "myPublicIP1"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Dynamic" //dynamic ip can be changed | static can
 }
-# Create public IPs for vm2
+# Create public IPs for NIC2 config
 resource "azurerm_public_ip" "myterraformpublicip2" {
   name                = "myPublicIP2"
   location            = azurerm_resource_group.rg.location
@@ -51,7 +51,7 @@ resource "azurerm_public_ip" "myterraformpublicip2" {
 }
 
 #network securtiy group can be attatchd to vm nic or subnet as well
-#here we are attaching it to vm nic
+#there we are attaching it to vm nic
 
 # Create Network Security Group and rule for vm1 
 resource "azurerm_network_security_group" "myterraformnsg1" {
