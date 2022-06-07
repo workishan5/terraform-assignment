@@ -1,6 +1,6 @@
-# terraform {
-#  backend "azure" {} 
-# }
+terraform {
+ backend "azure" {} 
+}
 
 resource "azurerm_resource_group" "rg" {
   name      = "myresourcegroup-infra"
