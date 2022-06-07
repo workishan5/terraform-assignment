@@ -4,7 +4,7 @@ terraform {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name      = "myresourcegoup"
+  name      = "myresourcegroup"
   location  = var.resource_group_location //"westeurope"
 }
 
@@ -35,14 +35,14 @@ resource "azurerm_subnet" "myterraformsubnet2" {
 
 #we can ssh(one of the way to connect) to the vm using this pubic ip over internet
 
-# Create public IPs NIC1 configuration
+# Create public IPs for NIC1
 resource "azurerm_public_ip" "myterraformpublicip1" {
   name                = "myPublicIP1"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic" //dynamic ip can be changed | static can
+  allocation_method   = "Dynamic" // changeable
 }
-# Create public IPs for NIC2 config
+# Create public IPs for NIC2
 resource "azurerm_public_ip" "myterraformpublicip2" {
   name                = "myPublicIP2"
   location            = azurerm_resource_group.rg.location
@@ -51,7 +51,7 @@ resource "azurerm_public_ip" "myterraformpublicip2" {
 }
 
 #network securtiy group can be attatchd to vm nic or subnet as well
-#there we are attaching it to vm nic
+#here we are attaching it to vm nic
 
 # Create Network Security Group and rule for vm1 
 resource "azurerm_network_security_group" "myterraformnsg1" {
@@ -79,7 +79,20 @@ resource "azurerm_network_security_group" "myterraformnsg2" {
   resource_group_name = azurerm_resource_group.rg.name
 
   security_rule {
-    name                       = "rule2"//name of sec rule
+    name                       = "ssh"
+    priority                   = 1000
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"//Tcp
+    source_port_range          = "*"
+    destination_port_range     = "22"//for inbound traffic dest port is given coz 
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+
+  security_rule {
+    name                       = "http"//
     priority                   = 1002
     direction                  = "Inbound"
     access                     = "Allow"
@@ -140,6 +153,13 @@ resource "tls_private_key" "example_ssh" {
   rsa_bits  = 4096
 }
 
+//for creating private key to connect with vm
+resource "local_file" "example_ssh" {
+  filename="key.pem"  
+  content=tls_private_key.example_ssh.private_key_openssh
+}
+
+
 # Create virtual machine vm1 
 resource "azurerm_linux_virtual_machine" "myterraformvm1" {
   name                  =   "vm1" //"slvm2" 
@@ -176,6 +196,10 @@ resource "azurerm_linux_virtual_machine" "myterraformvm1" {
   }
 }
 
+
+
+
+
 # Create virtual machine vm2
 resource "azurerm_linux_virtual_machine" "myterraformvm2" {
   name                  =   "vm2" //"slvm1"
@@ -211,9 +235,10 @@ resource "azurerm_linux_virtual_machine" "myterraformvm2" {
   }
 }
 
-# Create storage account for boot diagnostics
+Create storage account for boot diagnostics
+
 resource "azurerm_storage_account" "mystorageaccount" {
-  name                     = "ishanstorage"
+  name                     = "ishanstorage1"
   location                 = azurerm_resource_group.rg.location
   resource_group_name      = azurerm_resource_group.rg.name
   account_tier             = "Standard" //
@@ -221,16 +246,7 @@ resource "azurerm_storage_account" "mystorageaccount" {
 }
 
 
-
-
-
-#load balancer for config
-# resource "azurerm_resource_group" "example" {
-#   name     = "LoadBalancerRG"
-#   location = "West Europe"
-# }
-
-
+#load balancer(public IP for outbound connection to vm)
 
 resource "azurerm_public_ip" "publicip_lb" {
   name                = "PublicIPForLB"
@@ -249,4 +265,5 @@ resource "azurerm_lb" "example" {
     public_ip_address_id = azurerm_public_ip.publicip_lb.id
   }
 }
+
 
